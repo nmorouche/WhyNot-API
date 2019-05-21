@@ -1,24 +1,22 @@
 var express = require('express');
 var router = express.Router();
 
-const {MongoClient} = require('../config');
-const {MONGODB_URI} = require('../config');
-const {JWT_KEY} = require('../config');
-const {dbName} = require('../config');
-const {jwt} = require('../config');
-const {isUsernameValid} = require('../config');
-const {md5} = require('../config');
-const {dateNow} = require('../config');
+const {MongoClient} = require('../../../config');
+const {MONGODB_URI} = require('../../../config');
+const {JWT_KEY} = require('../../../config');
+const {dbName} = require('../../../config');
+const {jwt} = require('../../../config');
+const {isUsernameValid} = require('../../../config');
+const {md5} = require('../../../config');
+const {dateNow} = require('../../../config');
 
-/* GET users listing. */
 router.get('/login', async function(req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
-        const col = db.collection('users');
+        const col = db.collection('admin');
         let result = await col.find({}).toArray();
-        console.log(result);
         res.send({
             users: result
         });
@@ -36,7 +34,7 @@ router.post('/login', async function(req, res) {
     try {
         await client.connect();
         const db = client.db(dbName);
-        const col = db.collection('users');
+        const col = db.collection('admin');
         if(req.body.password.length <= 3) {
             res.status(400).send({error: 'Le mot de passe doit contenir au moins 4 caractères'});
         } else if(!isUsernameValid(req.body.username)) {
@@ -55,7 +53,9 @@ router.post('/login', async function(req, res) {
                         res.send({message: 'error'});
                     }
                     else {
-                        res.send(token);
+                        res.send({
+                            token
+                        });
                     }
                 });
             } else {
@@ -77,7 +77,7 @@ router.post('/signup', async function(req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     await client.connect();
     const db = client.db(dbName);
-    const col = db.collection('users');
+    const col = db.collection('admin');
     //INSERT ONE DOCUMENT
     let data = await col.find({}).toArray();
     if (req.body.password.length <= 3) {
@@ -94,16 +94,10 @@ router.post('/signup', async function(req, res, next) {
             email: req.body.email,
             username: req.body.username,
             password: md5(req.body.password),
-            photo: req.body.photo,
-            birthdate: req.body.birthdate,
-            sexe: req.body.sexe,
-            preference: req.body.preference,
-            bio: req.body.bio,
             createdAt: dateNow(),
-            updatedAt: null,
-            isDeleted: false
+            updatedAt: null
         });
-        let result = await col.find({username: req.body.username, password: md5(req.body.password)}).toArray();
+        let result = await col.find({email: req.body.email, username: req.body.username, password: md5(req.body.password)}).toArray();
         jwt.sign({
             _id: result[0]._id,
             username: result[0].username
