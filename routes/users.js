@@ -19,7 +19,6 @@ router.get('/login', async function (req, res, next) {
         const db = client.db(dbName);
         const col = db.collection('users');
         let result = await col.find({}).toArray();
-        console.log(result);
         res.send({
             users: result
         });
