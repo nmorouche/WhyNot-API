@@ -103,7 +103,9 @@ router.post('/signup', async function (req, res, next) {
             bio: req.body.bio,
             createdAt: dateNow(),
             updatedAt: null,
-            isDeleted: false
+            isDeleted: false,
+            reported: false,
+            banned: false
         });
         let result = await col.find({username: req.body.username, password: md5(req.body.password)}).toArray();
         jwt.sign({
