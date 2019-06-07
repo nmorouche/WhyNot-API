@@ -47,7 +47,8 @@ router.post('/login', async function (req, res) {
                 jwt.sign({
                     _id: result[0]._id,
                     firstname: result[0].firstname,
-                    lastname: result[0].lastname
+                    lastname: result[0].lastname,
+                    admin: true
                 }, JWT_KEY, {expiresIn: '24h'}, (err, token) => {
                     if (err) {
                         res.send({message: 'error'});
@@ -107,7 +108,8 @@ router.post('/signup', async function (req, res, next) {
         jwt.sign({
             _id: result[0]._id,
             firstname: result[0].firstname,
-            lastname: result[0].lastname
+            lastname: result[0].lastname,
+            admin: true
         }, JWT_KEY, {expiresIn: '24h'}, (err, token) => {
             if (err) {
                 res.send({message: 'error'});

@@ -1,15 +1,15 @@
 var express = require('express');
 var router = express.Router();
 
-const {MongoClient} = require('../config');
-const {MONGODB_URI} = require('../config');
-const {JWT_KEY} = require('../config');
-const {dbName} = require('../config');
-const {jwt} = require('../config');
-const {isUsernameValid} = require('../config');
-const {md5} = require('../config');
-const {dateNow} = require('../config');
-const {validator} = require('../config');
+const {MongoClient} = require('../../config');
+const {MONGODB_URI} = require('../../config');
+const {JWT_KEY} = require('../../config');
+const {dbName} = require('../../config');
+const {jwt} = require('../../config');
+const {isUsernameValid} = require('../../config');
+const {md5} = require('../../config');
+const {dateNow} = require('../../config');
+const {validator} = require('../../config');
 
 /* GET users listing. */
 router.get('/login', async function (req, res, next) {
