@@ -9,7 +9,7 @@ const {verifyToken} = require('../../middleware.js');
 const {ObjectId} = require('../../config.js');
 const {dateNow} = require('../../config');
 
-router.get('/', verifyToken, async function (req, res, next) {
+router.get('/', verifyToken, async (req, res, next) => {
     let result;
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
@@ -37,7 +37,7 @@ router.get('/', verifyToken, async function (req, res, next) {
     client.close();
 });
 
-router.get('/:id', verifyToken, async function (req, res, next) {
+router.get('/:id', verifyToken, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -54,7 +54,7 @@ router.get('/:id', verifyToken, async function (req, res, next) {
     client.close();
 });
 
-router.put('/', verifyTokenAdmin, async function (req, res, next) {
+router.put('/', verifyTokenAdmin, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -81,7 +81,7 @@ router.put('/', verifyTokenAdmin, async function (req, res, next) {
     client.close();
 });
 
-router.patch('/:id', verifyTokenAdmin, async function (req, res, next) {
+router.patch('/:id', verifyTokenAdmin, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -123,13 +123,41 @@ router.patch('/:id', verifyTokenAdmin, async function (req, res, next) {
                         updatedAt
                     }
                 });
-            let newEvent = await col.find({ _id: ObjectId(req.params.id) }).toArray();
+            let newEvent = await col.find({_id: ObjectId(req.params.id)}).toArray();
             res.send({
                 newEvent,
                 error: null
             });
         }
     } catch (err) {
+        res.send({error: err});
+    }
+});
+
+router.delete('/:id', verifyTokenAdmin, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('events');
+        let eventResult = await col.find().toArray();
+        let resultForEach = 0;
+        let event;
+        eventResult.forEach((resForEach) => {
+            if (resForEach._id.equals(req.params.id)) {
+                resultForEach = 1;
+                event = resForEach;
+            }
+        });
+        if (resultForEach === 0) {
+            res.status(404).send({error: 'L\'event n\'existe pas'});
+        } else {
+            await col.deleteOne({_id: event._id});
+            res.send({
+                error: null
+            });
+        }
+    } catch(err) {
         res.send({error: err});
     }
 });
