@@ -4,6 +4,7 @@ var router = express.Router();
 const {MongoClient} = require('../../config');
 const {MONGODB_URI} = require('../../config');
 const {dbName} = require('../../config');
+
 const {verifyTokenAdmin} = require('../../middleware.js');
 const {verifyToken} = require('../../middleware.js');
 const {ObjectId} = require('../../config.js');
@@ -11,10 +12,12 @@ const {dateNow} = require('../../config');
 
 router.get('/', verifyToken, async (req, res, next) => {
     let result;
+
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
+
         const col = db.collection('events');
         switch (req.query.sub_only) {
             case "true":
@@ -30,12 +33,14 @@ router.get('/', verifyToken, async (req, res, next) => {
         res.send({
             events: result,
             error: null
+
         });
     } catch (err) {
         res.send(err);
     }
     client.close();
 });
+
 
 router.get('/:id', verifyToken, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
@@ -161,5 +166,6 @@ router.delete('/:id', verifyTokenAdmin, async (req, res, next) => {
         res.send({error: err});
     }
 });
+
 
 module.exports = router;

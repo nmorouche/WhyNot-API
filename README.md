@@ -1,0 +1,1 @@
+docker run --rm --publish 27017:27017 --name whynotDB mongo:4
