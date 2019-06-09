@@ -1,16 +1,12 @@
 var express = require('express');
 var router = express.Router();
 
-const {MongoClient} = require('../config');
-const {MONGODB_URI} = require('../config');
-const {JWT_KEY} = require('../config');
-const {dbName} = require('../config');
-const {jwt} = require('../config');
-const {isUsernameValid} = require('../config');
-const {md5} = require('../config');
-const {dateNow} = require('../config');
-const {validator} = require('../config');
-const {verifyToken} = require('../middleware.js');
+const {MongoClient} = require('../../config');
+const {MONGODB_URI} = require('../../config');
+const {dbName} = require('../../config');
+const {dateNow} = require('../../config');
+const {verifyToken} = require('../../middleware.js');
+const {ObjectId} = require('../../config');
 
 router.post('/create', verifyToken, async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
@@ -18,22 +14,19 @@ router.post('/create', verifyToken, async function (req, res, next) {
         await client.connect();
         const db = client.db(dbName);
         const colReport = db.collection('report');
-        const colUser = db.collection('user');
+        const colUser = db.collection('users');
         //INSERT ONE DOCUMENT
         await colReport.insertOne({
             type: req.body.type,
             description: req.body.description,
-            idReporter: token._id,
+            idReporter: req.token._id,
             idReported: req.body.idReported,
-            createdAt: dateNow(),
-            updatedAt: null
+            createdAt: dateNow()
         });
-        await colUser.updateOne({_id:req.body.idReported},{reported:true})
-
-        console.log(req.token);
+        await colUser.updateOne({_id:ObjectId(req.body.idReported)},{$set: {reported:true}})
         res.send({
             status: 200,
-            error:null
+            error:null,
         });
     } catch (err) {
         res.send({error:err});
@@ -41,12 +34,12 @@ router.post('/create', verifyToken, async function (req, res, next) {
     client.close();
 });
 
-router.get('/getReportedUser', verifyToken, async function (req, res, next) {
+router.get('/', verifyToken, async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
-        const colUser = db.collection('user');
+        const colUser = db.collection('users');
         let data = await colUser.find({reported:true}).toArray();
         res.send({
             users: data,
@@ -58,13 +51,13 @@ router.get('/getReportedUser', verifyToken, async function (req, res, next) {
     client.close();
 });
 
-router.get('/getUserReport', verifyToken, async function (req, res, next) {
+router.get('/:idReported', verifyToken, async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
         const colReport = db.collection('report');
-        let data = await colReport.find({idReported:req.body.idReported}).toArray();
+        let data = await colReport.find({idReported:req.params.idReported}).toArray();
         res.send({
             users: data,
             error: null
@@ -80,9 +73,9 @@ router.post('/ban', verifyToken, async function (req, res, next) {
     try {
         await client.connect();
         const db = client.db(dbName);
-        const colUser = db.collection('user');
+        const colUser = db.collection('users');
         //INSERT ONE DOCUMENT
-        await colUser.updateOne({"_id":req.body.idReported},{banned:true,reported:false})
+        await colUser.updateOne({_id:ObjectId( req.body.idReported)},{$set: {banned:true,reported:false}})
 
         console.log(req.token);
         res.send({
@@ -94,3 +87,6 @@ router.post('/ban', verifyToken, async function (req, res, next) {
     }
     client.close();
 });
+
+
+module.exports = router;

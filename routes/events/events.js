@@ -1,10 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-const {MongoClient} = require('../config');
-const {MONGODB_URI} = require('../config');
-const {dbName} = require('../config');
-const {verifyToken} = require('../middleware.js');
+const {MongoClient} = require('../../config');
+const {MONGODB_URI} = require('../../config');
+const {dbName} = require('../../config');
+const {verifyToken} = require('../../middleware.js');
 
 router.get('/', verifyToken, async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
