@@ -5,6 +5,7 @@ const {MongoClient} = require('../../config');
 const {MONGODB_URI} = require('../../config');
 const {dbName} = require('../../config');
 const {dateNow} = require('../../config');
+const {verifyTokenAdmin} = require('../../middleware.js');
 const {verifyToken} = require('../../middleware.js');
 const {ObjectId} = require('../../config');
 
@@ -34,7 +35,7 @@ router.post('/create', verifyToken, async function (req, res, next) {
     client.close();
 });
 
-router.get('/', verifyToken, async function (req, res, next) {
+router.get('/', verifyTokenAdmin, async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -51,7 +52,7 @@ router.get('/', verifyToken, async function (req, res, next) {
     client.close();
 });
 
-router.get('/:idReported', verifyToken, async function (req, res, next) {
+router.get('/:idReported', verifyTokenAdmin, async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -68,7 +69,7 @@ router.get('/:idReported', verifyToken, async function (req, res, next) {
     client.close();
 });
 
-router.post('/ban', verifyToken, async function (req, res, next) {
+router.post('/ban', verifyTokenAdmin, async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
