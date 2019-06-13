@@ -27,6 +27,7 @@ app.use('/users', usersRouter);
 app.use('/report', reportRouter);
 app.use('/events', eventsRouter);
 app.use('/users/admin/', adminRouter);
+app.use('/uploads', express.static('uploads'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {

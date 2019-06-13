@@ -9,6 +9,8 @@ const {verifyTokenAdmin} = require('../../middleware.js');
 const {verifyToken} = require('../../middleware.js');
 const {ObjectId} = require('../../config.js');
 const {dateNow} = require('../../config');
+const {upload} = require('../../config');
+
 
 router.get('/', verifyToken, async (req, res, next) => {
     let result;
@@ -59,8 +61,9 @@ router.get('/:id', verifyToken, async (req, res, next) => {
     client.close();
 });
 
-router.put('/', verifyTokenAdmin, async (req, res, next) => {
+router.put('/', verifyTokenAdmin, upload.single('image'), async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    console.log(req.file);
     try {
         await client.connect();
         const db = client.db(dbName);
@@ -70,9 +73,9 @@ router.put('/', verifyTokenAdmin, async (req, res, next) => {
             description: req.body.description,
             address: req.body.address,
             date: req.body.date,
-            imageURL: req.body.imageURL,
-            price: req.body.price,
-            sub_only: req.body.sub_only,
+            imageURL: "http://localhost:3000/" + req.file.path,
+            price: parseInt(req.body.price),
+            sub_only: JSON.parse(req.body.sub_only),
             createdBy: req.token._id,
             createdAt: dateNow(),
             updatedAt: null
