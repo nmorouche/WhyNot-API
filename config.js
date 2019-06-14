@@ -6,6 +6,16 @@ const dbName = process.env.DBNAME || 'whynotDB';
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
 
+const multer = require('multer');
+const storage = multer.diskStorage({
+    destination: (req, file, cb) => {
+        cb(null, './public/images/');
+    },
+    filename: function (req, file, cb) {
+        cb(null, file.originalname);
+    }
+});
+const upload = multer({storage: storage});
 const jwt = require('jsonwebtoken');
 const md5 = require('md5');
 const validator = require("email-validator");
@@ -54,5 +64,6 @@ module.exports = {
     md5,
     isUsernameValid,
     dateNow,
-    validator
+    validator,
+    upload
 };
