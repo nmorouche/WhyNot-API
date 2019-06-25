@@ -12,10 +12,24 @@ const storage = multer.diskStorage({
         cb(null, './public/images/');
     },
     filename: function (req, file, cb) {
-        cb(null, file.originalname);
+        let newFileName = file.originalname;
+        if (newFileName.includes(' ')) {
+            newFileName = newFileName.replace(/ /g, "-");
+            newFileName = newFileName.replace(/'/g, "");
+        }
+        cb(null, newFileName);
     }
 });
-const upload = multer({storage: storage});
+
+const fileFilter = (req, file, cb) => {
+    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+        cb(null, true);
+    } else {
+        cb(new Error('yes'), false);
+    }
+};
+
+const upload = multer({storage, fileFilter});
 const jwt = require('jsonwebtoken');
 const md5 = require('md5');
 const validator = require("email-validator");
@@ -45,7 +59,7 @@ function isUsernameValid(str) {
     }
     for (var i = 0; i < str.length; i++) {
         if (str.charCodeAt(i) > 122 || str.charCodeAt(i) < 65) {
-            if(str.charCodeAt(i) < 97 || str.charCodeAt(i) > 90) {
+            if (str.charCodeAt(i) < 97 || str.charCodeAt(i) > 90) {
                 return false;
             }
         }
