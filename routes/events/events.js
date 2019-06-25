@@ -19,7 +19,6 @@ router.get('/', verifyToken, async (req, res, next) => {
     try {
         await client.connect();
         const db = client.db(dbName);
-
         const col = db.collection('events');
         switch (req.query.sub_only) {
             case "true":
@@ -63,7 +62,6 @@ router.get('/:id', verifyToken, async (req, res, next) => {
 
 router.put('/', verifyTokenAdmin, upload.single('image'), async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
-    console.log(req.file);
     try {
         await client.connect();
         const db = client.db(dbName);
