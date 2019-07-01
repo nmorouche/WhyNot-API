@@ -40,6 +40,22 @@ router.get("/", verifyToken, async (req, res, next) => {
   }
   client.close();
 });
+router.get("/register", verifyToken, async (req, res, next) => {
+  console.log("test");
+  
+  const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
+  try {
+    await client.connect();
+    const db = client.db(dbName);
+    const col = db.collection("register");
+    result = await col.find({ }).toArray();
+    res.send({
+      error: result
+    })
+  } catch (err) {
+    res.send({ error: err });
+  }
+});
 
 //get one
 router.get("/:id", verifyToken, async (req, res, next) => {
@@ -90,6 +106,7 @@ router.put(
     client.close();
   }
 );
+
 //modification
 router.patch("/:id", verifyTokenAdmin, async (req, res, next) => {
   const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
@@ -174,37 +191,34 @@ router.delete("/:id", verifyTokenAdmin, async (req, res, next) => {
 });
 
 //inscription
-router.patch("inscription/:id", verifyToken, async (req, res, next) => {
+router.post("/register", verifyToken, async (req, res, next) => {
   const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
   try {
     await client.connect();
     const db = client.db(dbName);
-    const colEvent = db.collection("events");
-    const colUser = db.collection("users");
-    let eventResult = await colEvent
-      .find({ _id: ObjectId(req.param.id) })
-      .toArray();
-    let resultForEach = 0;
-    let event;
-    eventResult.forEach(resForEach => {
-      if (resForEach._id.equals(req.params.id)) {
-        resultForEach = 1;
-        event = resForEach;
-      }
-    });
-    if (resultForEach === 0) {
-      res.status(404).send({ error: "L'event n'existe pas" });
-    } else {
-      //verifier que participationEvent possede une date anterieur a today ou pas de date
-
-      await colUser.updateOne(
-        { _id: ObjectId(token.id) },
-        { $set: { participationEvent: event.date } }
-      );
+    const col = db.collection("register");
+    result = await col.find({userId: req.body.userId,eventId:req.body.eventId}).toArray();
+    if (!result) {
+      console.log("test");
+      await col.insertOne({
+        userId: req.body.userId,
+        eventId: req.body.eventId,
+        createdAt: dateNow()
+      });
+      res.send({
+        error: null
+      })
+    }else{
+      res.send({
+        error:"vous etrs deja inscrit a cet event "
+      });
     }
+    
   } catch (err) {
     res.send({ error: err });
   }
 });
+
+
 
 module.exports = router;
