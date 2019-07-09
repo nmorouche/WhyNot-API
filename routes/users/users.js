@@ -13,7 +13,12 @@ const {md5} = require('../../config');
 const {dateNow} = require('../../config');
 const {validator} = require('../../config');
 const {upload} = require('../../config');
-var path = require('path');
+
+router.get('/', (req, res, next) => {
+    res.send({
+        message: "yup ;)"
+    })
+});
 
 /* GET users listing. */
 router.get('/login', async function (req, res, next) {
