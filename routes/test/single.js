@@ -12,13 +12,6 @@ const {dateNow} = require('../../config');
 const {upload} = require('../../config');
 
 router.put('/single', upload.single('image'), async (req, res, next) => {
-    console.log(req.body.email + '\n' +
-        req.body.username + '\n' +
-        req.body.password + '\n' +
-        req.body.gender + '\n' +
-        req.body.birthdate + '\n' +
-        req.body.bio + '\n' +
-        req.body.preferences);
     res.send({
         toz: "watozzzz"
     })
