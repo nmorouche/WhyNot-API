@@ -34,7 +34,6 @@ router.get('/login', async function (req, res, next) {
 
 /* SIGN IN */
 router.post('/login', async function (req, res) {
-    console.log(path.baseName);
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -100,7 +99,7 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
             email: req.body.email,
             username: req.body.username,
             password: md5(req.body.password),
-            photo: "http://localhost:3000/" + req.file.path,
+            photo: "https://whynot-api.herokuapp.com/" + req.file.path,
             birthdate: req.body.birthdate,
             gender: req.body.gender,
             preference: req.body.preference,
