@@ -42,6 +42,23 @@ router.get('/', verifyToken, async (req, res, next) => {
     client.close();
 });
 
+router.get('/register', verifyToken, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('register');
+        let result = await col.find({}).toArray();
+        res.send({
+            events: result,
+            error: null
+
+        });
+    } catch (err) {
+        res.send(err);
+    }
+    client.close();
+});
 
 router.get('/:id', verifyToken, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
@@ -138,6 +155,7 @@ router.patch('/:id', verifyTokenAdmin, async (req, res, next) => {
     } catch (err) {
         res.send({error: err});
     }
+    client.close();
 });
 
 router.delete('/:id', verifyTokenAdmin, async (req, res, next) => {
@@ -163,9 +181,31 @@ router.delete('/:id', verifyTokenAdmin, async (req, res, next) => {
                 error: null
             });
         }
-    } catch(err) {
+    } catch (err) {
         res.send({error: err});
     }
+    client.close();
+});
+
+router.post('/register', verifyToken, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('register');
+        await col.insertOne({
+            userId: req.body.userId,
+            eventId: req.body.eventId,
+            createdAt: dateNow()
+        });
+        let result = await col.find({ }).toArray();
+        res.send({
+            result
+        })
+    } catch (err) {
+        res.send({ error: err });
+    }
+    client.close();
 });
 
 

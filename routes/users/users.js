@@ -10,6 +10,8 @@ const {isUsernameValid} = require('../../config');
 const {md5} = require('../../config');
 const {dateNow} = require('../../config');
 const {validator} = require('../../config');
+const {upload} = require('../../config');
+var path = require('path');
 
 /* GET users listing. */
 router.get('/login', async function (req, res, next) {
@@ -32,6 +34,7 @@ router.get('/login', async function (req, res, next) {
 
 /* SIGN IN */
 router.post('/login', async function (req, res) {
+    console.log(path.baseName);
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -52,9 +55,10 @@ router.post('/login', async function (req, res) {
                     preference: result[0].preference
                 }, JWT_KEY, {expiresIn: '24h'}, (err, token) => {
                     if (err) {
-                        res.send({message: 'error'});
+                        res.send({error: 'error'});
                     } else {
                         res.send({
+                            user: result[0],
                             token,
                             error: null
                         });
@@ -75,7 +79,7 @@ router.post('/login', async function (req, res) {
 });
 
 /* POST users */
-router.post('/signup', async function (req, res, next) {
+router.post('/signup', upload.single('image'), async function (req, res, next) {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     await client.connect();
     const db = client.db(dbName);
@@ -84,7 +88,7 @@ router.post('/signup', async function (req, res, next) {
     let data = await col.find({}).toArray();
     if (!validator.validate(req.body.email)) {
         res.status(400).send({error: 'Email invalide'});
-    } else if(!isUsernameValid(req.body.username)){
+    } else if (!isUsernameValid(req.body.username)) {
         res.status(400).send({error: 'Le nom d\'utilisateur ne doit contenir uniquement des lettres'});
     } else if (req.body.password.length < 5) {
         res.status(400).send({error: 'Le mot de passe doit contenir au moins 5 caractères'});
@@ -96,14 +100,13 @@ router.post('/signup', async function (req, res, next) {
             email: req.body.email,
             username: req.body.username,
             password: md5(req.body.password),
-            photo: req.body.photo,
+            photo: "http://localhost:3000/" + req.file.path,
             birthdate: req.body.birthdate,
-            sexe: req.body.sexe,
+            gender: req.body.gender,
             preference: req.body.preference,
             bio: req.body.bio,
             createdAt: dateNow(),
             updatedAt: null,
-
             isDeleted: false,
             reported: false,
             banned: false
@@ -121,6 +124,7 @@ router.post('/signup', async function (req, res, next) {
                 res.send({message: 'error'});
             } else {
                 res.send({
+                    user: result[0],
                     token,
                     error: null
                 });
@@ -128,5 +132,36 @@ router.post('/signup', async function (req, res, next) {
         });
     }
 });
+
+/* DELETE user */
+router.delete('/:id', async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('users');
+        let eventResult = await col.find().toArray();
+        let resultForEach = 0;
+        let event;
+        eventResult.forEach((resForEach) => {
+            if (resForEach._id.equals(req.params.id)) {
+                resultForEach = 1;
+                event = resForEach;
+            }
+        });
+        if (resultForEach === 0) {
+            res.status(404).send({error: 'L\'utilisateur n\'existe pas'});
+        } else {
+            await col.deleteOne({_id: event._id});
+            res.send({
+                error: null
+            });
+        }
+    } catch (err) {
+        res.send({error: err});
+    }
+    client.close();
+});
+
 
 module.exports = router;
