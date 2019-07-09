@@ -89,5 +89,19 @@ router.post('/ban', verifyTokenAdmin, async function (req, res, next) {
     client.close();
 });
 
+router.get('/register', async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('register');
+        var result = await col.find({}).toArray();
+        res.send({
+            result
+        })
+    } catch (err) {
+        res.send({error: err});
+    }
+});
 
 module.exports = router;
