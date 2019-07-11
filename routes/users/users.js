@@ -31,54 +31,46 @@ router.get("/login", async function(req, res, next) {
 });
 
 /* SIGN IN */
-router.post("/login", async function(req, res) {
-  const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
+router.post('/login', async function (req, res) {
+  const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
   try {
-    await client.connect();
-    const db = client.db(dbName);
-    const col = db.collection("users");
-    if (!validator.validate(req.body.email)) {
-      res.status(400).send({ error: "Email invalide" });
-    } else if (req.body.password.length < 5) {
-      res
-        .status(400)
-        .send({ error: "Le mot de passe doit contenir au moins 5 caractères" });
-    } else {
-      var result = await col
-        .find({ email: req.body.email, password: md5(req.body.password) })
-        .toArray();
-      if (result.length) {
-        jwt.sign(
-          {
-            _id: result[0]._id,
-            email: result[0].email,
-            username: result[0].username,
-            sexe: result[0].sexe,
-            preference: result[0].preference
-          },
-          JWT_KEY,
-          { expiresIn: "24h" },
-          (err, token) => {
-            if (err) {
-              res.send({ message: "error" });
-            } else {
-              res.send({
-                token,
-                error: null
-              });
-            }
-          }
-        );
+      await client.connect();
+      const db = client.db(dbName);
+      const col = db.collection('users');
+      if (!validator.validate(req.body.email)) {
+          res.status(400).send({error: 'Email invalide'});
+      } else if (req.body.password.length < 5) {
+          res.status(400).send({error: 'Le mot de passe doit contenir au moins 5 caractères'});
       } else {
-        res.status(403).send({
-          error: "Cet identifiant ou mot de passe est inconnu"
-        });
+          var result = await col.find({email: req.body.email, password: md5(req.body.password)}).toArray();
+          if (result.length) {
+              jwt.sign({
+                  _id: result[0]._id,
+                  email: result[0].email,
+                  username: result[0].username,
+                  sexe: result[0].sexe,
+                  preference: result[0].preference
+              }, JWT_KEY, {expiresIn: '24h'}, (err, token) => {
+                  if (err) {
+                      res.send({error: 'error'});
+                  } else {
+                      res.send({
+                          user: result[0],
+                          token,
+                          error: null
+                      });
+                  }
+              });
+          } else {
+              res.status(403).send({
+                  error: 'Cet identifiant ou mot de passe est inconnu'
+              });
+          }
       }
-    }
   } catch (err) {
-    res.send({
-      error: err
-    });
+      res.send({
+          error: err
+      })
   }
   client.close();
 });

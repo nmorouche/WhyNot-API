@@ -12,7 +12,7 @@ const { dateNow } = require("../../config");
 const { upload } = require("../../config");
 
 // get all
-router.get("/", verifyToken, async (req, res, next) => {
+router.get("/", /*verifyToken,*/ async (req, res, next) => {
   let result;
 
   const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
@@ -49,6 +49,8 @@ router.get("/register", verifyToken, async (req, res, next) => {
     const db = client.db(dbName);
     const col = db.collection("register");
     result = await col.find({ }).toArray();
+    console.log(result);
+    
     res.send({
       error: result
     })
@@ -191,26 +193,33 @@ router.delete("/:id", verifyTokenAdmin, async (req, res, next) => {
 });
 
 //inscription
-router.post("/register", verifyToken, async (req, res, next) => {
+router.post("/register", /*verifyToken,*/ async (req, res, next) => {
   const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
   try {
     await client.connect();
     const db = client.db(dbName);
     const col = db.collection("register");
-    result = await col.find({userId: req.body.userId,eventId:req.body.eventId}).toArray();
-    if (!result) {
+    console.log(req.body.userId,req.body.eventId);
+    
+    let result = await col.find({userId: req.body.userId,eventId:req.body.eventId}).toArray();
+    console.log("yo",result[0]);
+    
+    if (!result[0]) {
       console.log("test");
       await col.insertOne({
         userId: req.body.userId,
         eventId: req.body.eventId,
         createdAt: dateNow()
       });
+      let fin = await col.find({}).toArray();
+      console.log(fin);
+      
       res.send({
         error: null
       })
     }else{
-      res.send({
-        error:"vous etrs deja inscrit a cet event "
+      res.status(403).send({
+        error:"vous etes deja inscrit a cet event "
       });
     }
     
