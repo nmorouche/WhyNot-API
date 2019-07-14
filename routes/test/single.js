@@ -11,10 +11,26 @@ const {ObjectId} = require('../../config.js');
 const {dateNow} = require('../../config');
 const {upload} = require('../../config');
 
-router.put('/single', upload.single('image'), async (req, res, next) => {
-    res.send({
-        toz: "watozzzz"
-    })
+
+router.patch('/viewers', verifyToken, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('users');
+        let insertResult = await col.updateOne(
+            {_id: ObjectId(req.params.id)},
+            {
+                $set: {
+                    viewers: "gloglo"
+                }
+            });
+    } catch (err) {
+        res.send({
+            error: err
+        });
+    }
+    client.close();
 });
 
 module.exports = router;

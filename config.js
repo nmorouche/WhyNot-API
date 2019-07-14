@@ -2,6 +2,7 @@ const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/whynot
 const JWT_KEY = process.env.JWT_KEY || 'why-not';
 const PORT = process.env.PORT || 3000;
 const dbName = process.env.DBNAME || 'whynotDB';
+const BASEAPPURL = process.env.BASEAPPURL || 'http://localhost:3000/';
 
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
@@ -71,6 +72,7 @@ module.exports = {
     ObjectId,
     MongoClient,
     MONGODB_URI,
+    BASEAPPURL,
     dbName,
     JWT_KEY,
     PORT,
