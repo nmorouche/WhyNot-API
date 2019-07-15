@@ -7,34 +7,100 @@ const {MongoClient} = require('../../config');
 const {MONGODB_URI} = require('../../config');
 const {JWT_KEY} = require('../../config');
 const {dbName} = require('../../config');
+const {BASEAPPURL} = require('../../config');
 const {jwt} = require('../../config');
+const {ObjectId} = require('../../config');
+const {verifyToken} = require('../../middleware');
 const {isUsernameValid} = require('../../config');
 const {md5} = require('../../config');
 const {dateNow} = require('../../config');
 const {validator} = require('../../config');
 const {upload} = require('../../config');
 
-router.get('/', (req, res, next) => {
-    res.send({
-        message: "yup ;)"
-    })
-});
-
-/* GET users listing. */
-router.get('/login', async function (req, res, next) {
+router.get('/', verifyToken, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
         const col = db.collection('users');
-        let result = await col.find({}).toArray();
-        res.send({
-            users: result
-        });
+        let result;
+        if (req.token.preference === 2) {
+            result = await col.find({
+                _id: {
+                    $not: {
+                        $elemMatch: {
+                            _id: ObjectId(req.token._id)
+                        }
+                    }
+                },
+                viewers: {
+                    $not: {
+                        $elemMatch: {
+                            _id: req.token._id
+                        }
+                    }
+                }
+            }).toArray();
+        } else {
+            result = await col.find({
+                _id: {$nin: [ObjectId(req.token._id)]},
+                gender: req.token.preference,
+                viewers: {
+                    $not: {
+                        $elemMatch: {
+                            _id: req.token._id
+                        }
+                    }
+                }
+            }).toArray();
+        }
+        res.send(result);
     } catch (err) {
         res.send({
             error: err
         });
+    }
+    client.close();
+});
+
+router.get('/login', verifyToken, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('users');
+        let result = await col.find().toArray();
+        res.send(result);
+    } catch (err) {
+        res.send({
+            error: err
+        });
+    }
+    client.close();
+});
+
+router.patch('/viewers', verifyToken, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('users');
+        let insertResult = await col.updateOne(
+            {_id: ObjectId(req.query._id)},
+            {
+                $push: {
+                    viewers: {
+                        _id: req.token._id
+                    }
+                }
+            });
+        res.send({
+            error: null
+        });
+    } catch (err) {
+        res.send({
+            error: err
+        })
     }
     client.close();
 });
@@ -64,7 +130,6 @@ router.post('/login', async function (req, res) {
                         res.send({error: 'error'});
                     } else {
                         res.send({
-                            user: result[0],
                             token,
                             error: null
                         });
@@ -106,11 +171,12 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
             email: req.body.email,
             username: req.body.username,
             password: md5(req.body.password),
-            photo: "https://whynot-api.herokuapp.com/" + req.file.path,
+            photo: BASEAPPURL + req.file.path,
             birthdate: req.body.birthdate,
-            gender: req.body.gender,
-            preference: req.body.preference,
+            gender: parseInt(req.body.gender),
+            preference: parseInt(req.body.preference),
             bio: req.body.bio,
+            viewers: [],
             createdAt: dateNow(),
             updatedAt: null,
             isDeleted: false,
@@ -130,7 +196,6 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
                 res.send({message: 'error'});
             } else {
                 res.send({
-                    user: result[0],
                     token,
                     error: null
                 });

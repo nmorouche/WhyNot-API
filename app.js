@@ -8,6 +8,8 @@ var usersRouter = require('./routes/users/users');
 var reportRouter = require('./routes/reports/report');
 var eventsRouter = require('./routes/events/events');
 var adminRouter = require('./routes/users/admin/adminAuth');
+var likeRouter = require('./routes/match/like');
+var matchRouter = require('./routes/match/match');
 var testRouter = require('./routes/test/single');
 var app = express();
 
@@ -26,6 +28,8 @@ app.use('/report', reportRouter);
 app.use('/events', eventsRouter);
 app.use('/users/admin', adminRouter);
 app.use('/test', testRouter);
+app.use('/users/like', likeRouter);
+app.use('/users/match', matchRouter);
 app.use('/public/images', express.static('public/images'));
 
 // catch 404 and forward to error handler

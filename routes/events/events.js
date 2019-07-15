@@ -4,13 +4,13 @@ var router = express.Router();
 const {MongoClient} = require('../../config');
 const {MONGODB_URI} = require('../../config');
 const {dbName} = require('../../config');
+const {BASEAPPURL} = require('../../config');
 
 const {verifyTokenAdmin} = require('../../middleware.js');
 const {verifyToken} = require('../../middleware.js');
 const {ObjectId} = require('../../config.js');
 const {dateNow} = require('../../config');
 const {upload} = require('../../config');
-
 
 router.get('/', verifyToken, async (req, res, next) => {
     let result;
@@ -88,7 +88,7 @@ router.put('/', verifyTokenAdmin, upload.single('image'), async (req, res, next)
             description: req.body.description,
             address: req.body.address,
             date: req.body.date,
-            imageURL: "http://localhost:3000/" + req.file.path,
+            imageURL: BASEAPPURL + req.file.path,
             price: parseInt(req.body.price),
             sub_only: JSON.parse(req.body.sub_only),
             createdBy: req.token._id,
@@ -188,7 +188,7 @@ router.delete('/:id', verifyTokenAdmin, async (req, res, next) => {
 });
 
 router.post('/register', verifyToken, async (req, res, next) => {
-    const client = new MongoClient(MONGODB_URI, { useNewUrlParser: true });
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
@@ -198,12 +198,12 @@ router.post('/register', verifyToken, async (req, res, next) => {
             eventId: req.body.eventId,
             createdAt: dateNow()
         });
-        let result = await col.find({ }).toArray();
+        let result = await col.find({}).toArray();
         res.send({
             result
         })
     } catch (err) {
-        res.send({ error: err });
+        res.send({error: err});
     }
     client.close();
 });
