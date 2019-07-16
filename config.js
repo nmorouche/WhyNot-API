@@ -13,12 +13,7 @@ const storage = multer.diskStorage({
         cb(null, './public/images/');
     },
     filename: function (req, file, cb) {
-        let newFileName = file.originalname;
-        if (newFileName.includes(' ')) {
-            newFileName = newFileName.replace(/ /g, "-");
-            newFileName = newFileName.replace(/'/g, "");
-        }
-        cb(null, newFileName);
+        cb(null, file.originalname);
     }
 });
 

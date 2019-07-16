@@ -14,7 +14,6 @@ const {upload} = require('../../config');
 
 router.get('/', verifyToken, async (req, res, next) => {
     let result;
-
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
@@ -194,7 +193,7 @@ router.post('/register', verifyToken, async (req, res, next) => {
         const db = client.db(dbName);
         const col = db.collection('register');
         await col.insertOne({
-            userId: req.body.userId,
+            userId: req.token._id,
             eventId: req.body.eventId,
             createdAt: dateNow()
         });

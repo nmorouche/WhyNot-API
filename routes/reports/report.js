@@ -10,8 +10,6 @@ const {verifyToken} = require('../../middleware.js');
 const {ObjectId} = require('../../config');
 
 router.post('/create', verifyToken, async function (req, res, next) {
-    console.log(req.body.description,req.body.idReported,req.body.type,req.token._id);
-    
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
