@@ -125,7 +125,7 @@ router.post('/login', async function (req, res) {
                     _id: result[0]._id,
                     email: result[0].email,
                     username: result[0].username,
-                    sexe: result[0].sexe,
+                    gender: result[0].gender,
                     preference: result[0].preference
                 }, JWT_KEY, {expiresIn: '24h'}, (err, token) => {
                     if (err) {
