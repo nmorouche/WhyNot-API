@@ -10,7 +10,6 @@ var eventsRouter = require('./routes/events/events');
 var adminRouter = require('./routes/users/admin/adminAuth');
 var likeRouter = require('./routes/match/like');
 var matchRouter = require('./routes/match/match');
-var testRouter = require('./routes/test/single');
 var app = express();
 
 // view engine setup
