@@ -39,12 +39,14 @@ router.get('/', verifyToken, async (req, res, next) => {
                             _id: req.token._id
                         }
                     }
-                }
+                },
+                preference: 2
             }).toArray();
         } else {
             result = await col.find({
                 _id: {$nin: [ObjectId(req.token._id)]},
                 gender: req.token.preference,
+                preference: req.token.gender,
                 viewers: {
                     $not: {
                         $elemMatch: {
@@ -189,7 +191,7 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
             _id: result[0]._id,
             email: result[0].email,
             username: result[0].username,
-            sexe: result[0].sexe,
+            gender: result[0].gender,
             preference: result[0].preference
         }, JWT_KEY, {expiresIn: '24h'}, (err, token) => {
             if (err) {
