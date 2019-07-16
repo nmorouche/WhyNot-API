@@ -27,10 +27,9 @@ app.use('/users', usersRouter);
 app.use('/report', reportRouter);
 app.use('/events', eventsRouter);
 app.use('/users/admin', adminRouter);
-app.use('/test', testRouter);
 app.use('/users/like', likeRouter);
 app.use('/users/match', matchRouter);
-app.use('/public/images', express.static('public/images'));
+app.use('/public', express.static('public'));
 
 // catch 404 and forward to error handler
 app.use(function(req, res, next) {
