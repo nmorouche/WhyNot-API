@@ -17,13 +17,18 @@ const {dateNow} = require('../../config');
 const {validator} = require('../../config');
 const {upload} = require('../../config');
 
-router.get('/', async (req, res, next) => {
+router.get('/', verifyToken, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
         const col = db.collection('match');
-        let result = await col.find().toArray();
+        let result = await col.find({
+            $or: [
+                {user1: req.token._id},
+                {user2: req.token._id}
+            ]
+        }).toArray();
         res.send(result);
     } catch (err) {
         res.send({
@@ -31,21 +36,6 @@ router.get('/', async (req, res, next) => {
         });
     }
     client.close();
-});
-
-router.put('/', verifyToken, async (req, res, next) => {
-    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
-    try {
-        await client.connect();
-        const db = client.db(dbName);
-        const col = db.collection('match');
-        let result = await col.find().toArray();
-        res.send(result);
-    } catch (err) {
-        res.send({
-            error: err
-        });
-    }
 });
 
 module.exports = router;

@@ -19,9 +19,6 @@ router.get('/', verifyToken, async (req, res, next) => {
         await client.connect();
         const db = client.db(dbName);
         const col = db.collection('events');
-        if (req.query._id) {
-            result = await col.find({_id: ObjectId(req.query._id)}).toArray();
-        }
         switch (req.query.sub_only) {
             case "true":
                 result = await col.find({sub_only: true}).toArray();
@@ -32,6 +29,27 @@ router.get('/', verifyToken, async (req, res, next) => {
             default:
                 result = await col.find({}).toArray();
                 break;
+        }
+        res.send({
+            events: result,
+            error: null
+
+        });
+    } catch (err) {
+        res.send(err);
+    }
+    client.close();
+});
+
+router.get('/myevent/', verifyToken, async (req, res, next) => {
+    let result;
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('events');
+        if (req.query._id) {
+            result = col.find({_id: ObjectId(req.query._id)}).toArray();
         }
         res.send({
             events: result,
