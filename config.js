@@ -13,6 +13,8 @@ const storage = multer.diskStorage({
         cb(null, './public/images/');
     },
     filename: function (req, file, cb) {
+        let date = Date.now();
+        file.originalname = date.toString();
         cb(null, file.originalname);
     }
 });
