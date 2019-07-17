@@ -41,18 +41,19 @@ router.get('/', verifyToken, async (req, res, next) => {
     client.close();
 });
 
-router.get('/myevent/', verifyToken, async (req, res, next) => {
+router.get('/myevents/', verifyToken, async (req, res, next) => {
     let result;
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
         const col = db.collection('register');
+        const eventCol = db.collection('events');
         let result1 = await col.find({
             userId: req.token._id
         }).toArray();
         if (result1.length !== 0) {
-            result = await col.find({_id: ObjectId(result1[0].eventId)}).toArray();
+            result = await eventCol.find({_id: ObjectId(result1[0].eventId)}).toArray();
         }
         res.send({
             events: result,
