@@ -24,25 +24,28 @@ router.get('/', verifyToken, async (req, res, next) => {
         const db = client.db(dbName);
         const col = db.collection('match');
         const userCol = db.collection('users');
+        let result = [];
         let result1 = await col.find({
-            $not: {
-                user1: req.token._id
-            }
+            user1: {$nin: [req.token._id]}
         }).toArray();
         let result2 = await col.find({
-            $not: {
-                user2: req.token._id
-            }
+            user2: {$nin: [req.token._id]}
         }).toArray();
         if (result1 !== 0) {
-            result1.forEach(async user => {
-                result = await userCol.find({_id: ObjectId(user._id)}).toArray();
-            });
+            for (let x = 0; x < result1.length; x++) {
+                let finalUsersTab = await userCol.find({_id: ObjectId(result1[x].user2)}).toArray();
+                if (finalUsersTab.length !== 0) {
+                    result.push(finalUsersTab[0]);
+                }
+            }
         }
         if (result2 !== 0) {
-            result2.forEach(async user => {
-                result = await userCol.find({_id: ObjectId(user._id)}).toArray();
-            });
+            for (let x = 0; x < result2.length; x++) {
+                let finalUsersTab = await userCol.find({_id: ObjectId(result2[x].user2)}).toArray();
+                if (finalUsersTab.length !== 0) {
+                    result.push(finalUsersTab[0]);
+                }
+            }
         }
         res.send(result);
     } catch (err) {
