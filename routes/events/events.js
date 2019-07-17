@@ -19,6 +19,9 @@ router.get('/', verifyToken, async (req, res, next) => {
         await client.connect();
         const db = client.db(dbName);
         const col = db.collection('events');
+        if (req.query._id) {
+            result = await col.find({_id: ObjectId(req.query._id)}).toArray();
+        }
         switch (req.query.sub_only) {
             case "true":
                 result = await col.find({sub_only: true}).toArray();
