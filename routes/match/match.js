@@ -34,14 +34,14 @@ router.get('/', verifyToken, async (req, res, next) => {
                 user2: req.token._id
             }
         }).toArray();
-        if (result1 != 0) {
+        if (result1 !== 0) {
             result1.forEach(async user => {
-                result = await userCol.find({_id: user._id}).toArray();
+                result = await userCol.find({_id: ObjectId(user._id)}).toArray();
             });
         }
-        if (result2 != 0) {
+        if (result2 !== 0) {
             result2.forEach(async user => {
-                result = await userCol.find({_id: user._id}).toArray();
+                result = await userCol.find({_id: ObjectId(user._id)}).toArray();
             });
         }
         res.send(result);
