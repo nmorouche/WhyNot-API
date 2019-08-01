@@ -132,6 +132,9 @@ router.post('/login', async function (req, res) {
                         res.send({error: 'error'});
                     } else {
                         res.send({
+                            email: result[0].email,
+                            username: result[0].username,
+                            photo: result[0].photo,
                             token,
                             error: null
                         });
@@ -198,6 +201,9 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
                 res.send({message: 'error'});
             } else {
                 res.send({
+                    email: result[0].email,
+                    username: result[0].username,
+                    photo: result[0].photo,
                     token,
                     error: null
                 });
