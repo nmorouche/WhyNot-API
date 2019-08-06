@@ -65,14 +65,37 @@ router.get('/', verifyToken, async (req, res, next) => {
     client.close();
 });
 
-router.get('/login', verifyToken, async (req, res, next) => {
+router.get('/myAccount', verifyToken, async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
     try {
         await client.connect();
         const db = client.db(dbName);
         const col = db.collection('users');
-        let result = await col.find().toArray();
-        res.send(result);
+        let result = await col.find({_id: ObjectId(req.token._id)}).toArray();
+        if (result.length !== 0) {
+            res.send(result[0]);
+        } else {
+            res.send(result);
+        }
+    } catch (err) {
+        res.send({
+            error: err
+        });
+    }
+    client.close();
+});
+
+router.patch('/myAccount', verifyToken, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('users');
+        await col.updateOne(
+            {_id: ObjectId(req.token._id)},
+            {
+
+            });
     } catch (err) {
         res.send({
             error: err

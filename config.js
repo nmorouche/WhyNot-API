@@ -13,15 +13,14 @@ const storage = multer.diskStorage({
         cb(null, './public/images/');
     },
     filename: function (req, file, cb) {
-
-        let date = Date.now() + file.originalname.substr(file.originalname.length - 3);
+        let date = Date.now() + '.' + file.originalname.substr(file.originalname.length - 3);
         file.originalname = date;
-        cb(null, file.originalname);
+        cb(null, date);
     }
 });
 
 const fileFilter = (req, file, cb) => {
-    if(file.mimetype === 'image/jpeg' || file.mimetype === 'image/png'){
+    if (file.mimetype === 'image/jpeg' || file.mimetype === 'image/png') {
         cb(null, true);
     } else {
         cb(new Error('yes'), false);
