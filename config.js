@@ -30,6 +30,8 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({storage, fileFilter});
 const jwt = require('jsonwebtoken');
 const md5 = require('md5');
+const reverse = require('reverse-md5');
+const reverseMD5 = reverse();
 const validator = require("email-validator");
 
 function dateNow() {
@@ -78,5 +80,6 @@ module.exports = {
     isUsernameValid,
     dateNow,
     validator,
-    upload
+    upload,
+    reverseMD5
 };

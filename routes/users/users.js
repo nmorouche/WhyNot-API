@@ -94,8 +94,19 @@ router.patch('/myAccount', verifyToken, async (req, res, next) => {
         await col.updateOne(
             {_id: ObjectId(req.token._id)},
             {
-
+                $set: {
+                    email: req.body.email,
+                    username: req.body.username,
+                    password: md5(req.body.password),
+                    gender: parseInt(req.body.gender),
+                    preference: parseInt(req.body.preference),
+                    bio: req.body.bio,
+                    updatedAt: dateNow()
+                }
             });
+        res.send({
+            error: null
+        });
     } catch (err) {
         res.send({
             error: err
