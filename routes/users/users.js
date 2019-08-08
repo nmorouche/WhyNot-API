@@ -104,8 +104,25 @@ router.patch('/myAccount', verifyToken, async (req, res, next) => {
                     updatedAt: dateNow()
                 }
             });
-        res.send({
-            error: null
+        let result = await col.find({_id: ObjectId(req.token._id)}).toArray();
+        jwt.sign({
+            _id: result[0]._id,
+            email: result[0].email,
+            username: result[0].username,
+            gender: result[0].gender,
+            preference: result[0].preference
+        }, JWT_KEY, {expiresIn: '24h'}, (err, token) => {
+            if (err) {
+                res.send({message: 'error'});
+            } else {
+                res.send({
+                    email: result[0].email,
+                    username: result[0].username,
+                    photo: result[0].photo,
+                    token,
+                    error: null
+                });
+            }
         });
     } catch (err) {
         res.send({
