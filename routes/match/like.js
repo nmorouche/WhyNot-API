@@ -8,6 +8,7 @@ const {MONGODB_URI} = require('../../config');
 const {dbName} = require('../../config');
 const {verifyToken} = require('../../middleware');
 const {dateNow} = require('../../config');
+const {axiosFirebase} = require('../../config');
 
 router.get('/', async (req, res, next) => {
     const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
@@ -51,6 +52,15 @@ router.put('/', verifyToken, async (req, res, next) => {
                 user1: req.token._id,
                 user2: req.query._id,
                 date: dateNow()
+            });
+            const firebase = db.collection('firebase');
+            let result = await firebase.find({userID: req.query._id}).toArray();
+            await axiosFirebase.post('', {
+                "to": result[0].firebaseToken,
+                "notification": {
+                    "title": "Bonne nouvelle !",
+                    "body": "Tu as un nouveau match"
+                }
             });
             res.send({
                 match: true,

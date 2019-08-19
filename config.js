@@ -3,6 +3,7 @@ const JWT_KEY = process.env.JWT_KEY || 'why-not';
 const PORT = process.env.PORT || 3000;
 const dbName = process.env.DBNAME || 'whynotDB';
 const BASEAPPURL = process.env.BASEAPPURL || 'http://localhost:3000/';
+const FIREBASE_KEY = process.env.FIREBASE_KEY || 'AAAA8K6g49g:APA91bGHaaI_zphN6lm_sqVkUVtx5xG4iYvCLwGiM-bboH5xkluU3pUUF3a7V3CWfbtPuD4gau0Lh_xuIAaC_w-tmA_cquuAii7CWc6Iwc7x3h8Y2-RSY4of0uAV15Tj3OAcvKp4rtcB';
 
 const MongoClient = require('mongodb').MongoClient;
 const ObjectId = require('mongodb').ObjectId;
@@ -30,9 +31,10 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({storage, fileFilter});
 const jwt = require('jsonwebtoken');
 const md5 = require('md5');
-const reverse = require('reverse-md5');
-const reverseMD5 = reverse();
 const validator = require("email-validator");
+const axiosFirebase = require('axios');
+axiosFirebase.defaults.baseURL = "https://fcm.googleapis.com/fcm/send";
+axiosFirebase.defaults.headers.common['Authorization'] = 'key=' + FIREBASE_KEY;
 
 function dateNow() {
     var dateNow = new Date();
@@ -81,5 +83,6 @@ module.exports = {
     dateNow,
     validator,
     upload,
-    reverseMD5
+    FIREBASE_KEY,
+    axiosFirebase
 };

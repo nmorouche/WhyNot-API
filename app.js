@@ -10,6 +10,7 @@ var eventsRouter = require('./routes/events/events');
 var adminRouter = require('./routes/users/admin/adminAuth');
 var likeRouter = require('./routes/match/like');
 var matchRouter = require('./routes/match/match');
+var firebaseRouter = require('./routes/firebase/firebase');
 var app = express();
 
 
@@ -25,6 +26,7 @@ app.use('/events', eventsRouter);
 app.use('/users/admin', adminRouter);
 app.use('/users/like', likeRouter);
 app.use('/users/match', matchRouter);
+app.use('/firebase', firebaseRouter);
 app.use('/public/images', express.static('public/images'));
 
 // catch 404 and forward to error handler
