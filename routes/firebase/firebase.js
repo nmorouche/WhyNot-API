@@ -19,6 +19,7 @@ router.get('/', verifyToken, async (req, res, next) => {
     res.send({
         firebaseToken: result[0].firebaseToken
     });
+    client.close();
 });
 
 router.post('/registrate', verifyToken, async (req, res, next) => {
@@ -46,6 +47,7 @@ router.post('/registrate', verifyToken, async (req, res, next) => {
     res.send({
         error: null
     });
+    client.close();
 });
 
 module.exports = router;

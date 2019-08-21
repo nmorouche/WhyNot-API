@@ -42,4 +42,28 @@ router.get('/', verifyToken, async (req, res, next) => {
     client.close();
 });
 
+router.get('/roomName', verifyToken, async (req, res, next) => {
+    const client = new MongoClient(MONGODB_URI, {useNewUrlParser: true});
+    try {
+        await client.connect();
+        const db = client.db(dbName);
+        const col = db.collection('match');
+        let result = await col.find({}).toArray();
+        for (let i = 0; i < result.length; i++) {
+            if ((result[i].user1 === req.token._id && result[i].user2 === req.query._id) || (result[i].user2 === req.token._id && result[i].user1 === req.query._id)) {
+                res.send({
+                    roomName: result[i].roomName,
+                    error: null
+                });
+            }
+        }
+        res.send({
+            error: true
+        });
+    } catch (err) {
+
+    }
+    client.close();
+});
+
 module.exports = router;

@@ -261,6 +261,7 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
             }
         });
     }
+    client.close();
 });
 
 /* DELETE user */

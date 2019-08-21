@@ -121,6 +121,7 @@ router.post('/signup', async function (req, res, next) {
             }
         });
     }
+    client.close();
 });
 
 module.exports = router;

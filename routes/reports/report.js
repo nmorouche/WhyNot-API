@@ -102,6 +102,7 @@ router.get('/register', async (req, res, next) => {
     } catch (err) {
         res.send({error: err});
     }
+    client.close();
 });
 
 module.exports = router;
