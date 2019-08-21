@@ -51,7 +51,7 @@ router.put('/', verifyToken, async (req, res, next) => {
             await match.insertOne({
                 user1: req.token._id,
                 user2: req.query._id,
-                roomName: "observable" + req.token._id + req.query._id,
+                roomName: "observable-" + req.token._id + req.query._id,
                 date: dateNow()
             });
             const firebase = db.collection('firebase');
