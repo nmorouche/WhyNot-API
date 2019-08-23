@@ -53,6 +53,7 @@ router.get('/roomName', verifyToken, async (req, res, next) => {
             if ((result[i].user1 === req.token._id && result[i].user2 === req.query._id) || (result[i].user2 === req.token._id && result[i].user1 === req.query._id)) {
                 res.send({
                     roomName: result[i].roomName,
+                    myID: req.token._id,
                     error: null
                 });
             }
