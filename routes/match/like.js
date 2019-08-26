@@ -54,6 +54,14 @@ router.put('/', verifyToken, async (req, res, next) => {
                 roomName: "observable-" + req.token._id + req.query._id,
                 date: dateNow()
             });
+            const chat = db.collection('chat');
+            await chat.insertOne({
+                user1: req.token._id,
+                user2: req.query._id,
+                messages: [],
+                updatedAt: null,
+                createdAt: dateNow()
+            });
             const firebase = db.collection('firebase');
             let result = await firebase.find({userID: req.query._id}).toArray();
             await axiosFirebase.post('', {
