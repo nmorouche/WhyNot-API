@@ -4,13 +4,14 @@ var path = require('path');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 
-var usersRouter = require('./routes/users/users');
-var reportRouter = require('./routes/reports/report');
-var eventsRouter = require('./routes/events/events');
-var adminRouter = require('./routes/users/admin/adminAuth');
-var likeRouter = require('./routes/match/like');
-var matchRouter = require('./routes/match/match');
-var firebaseRouter = require('./routes/firebase/firebase');
+const usersRouter = require('./routes/users/users');
+const reportRouter = require('./routes/reports/report');
+const eventsRouter = require('./routes/events/events');
+const adminRouter = require('./routes/users/admin/adminAuth');
+const likeRouter = require('./routes/match/like');
+const matchRouter = require('./routes/match/match');
+const firebaseRouter = require('./routes/firebase/firebase');
+const chatRouter = require('./routes/chat/chat');
 var app = express();
 
 
@@ -27,6 +28,7 @@ app.use('/users/admin', adminRouter);
 app.use('/users/like', likeRouter);
 app.use('/users/match', matchRouter);
 app.use('/firebase', firebaseRouter);
+app.use('/chat', chatRouter);
 app.use('/public/images', express.static('public/images'));
 
 // catch 404 and forward to error handler
