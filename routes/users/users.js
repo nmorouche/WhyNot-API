@@ -1,5 +1,3 @@
-//TEST PROD
-
 var express = require('express');
 var router = express.Router();
 
@@ -153,7 +151,7 @@ router.patch('/viewers', verifyToken, async (req, res, next) => {
     } catch (err) {
         res.send({
             error: err
-        })
+        });
     }
     client.close();
 });
@@ -186,6 +184,7 @@ router.post('/login', async function (req, res) {
                             email: result[0].email,
                             username: result[0].username,
                             photo: result[0].photo,
+                            hobbies: result[0].hobbies,
                             token,
                             error: null
                         });
@@ -223,6 +222,7 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
         res.status(400).send({error: 'Cet email est déjà associé à un compte'});
     } else {
         //INSERT ONE DOCUMENT
+        let hobbies = req.body.hobbies.split(", ");
         await col.insertOne({
             email: req.body.email,
             username: req.body.username,
@@ -232,6 +232,7 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
             gender: parseInt(req.body.gender),
             preference: parseInt(req.body.preference),
             bio: req.body.bio,
+            hobbies,
             viewers: [],
             createdAt: dateNow(),
             updatedAt: null,
@@ -255,6 +256,7 @@ router.post('/signup', upload.single('image'), async function (req, res, next) {
                     email: result[0].email,
                     username: result[0].username,
                     photo: result[0].photo,
+                    hobbies: result[0].hobbies,
                     token,
                     error: null
                 });
@@ -293,6 +295,5 @@ router.delete('/:id', async (req, res, next) => {
     }
     client.close();
 });
-
 
 module.exports = router;
