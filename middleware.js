@@ -19,7 +19,6 @@ function verifyTokenAdmin(req, res, next) {
         if (err) {
             res.status(401).send({ error: 'Utilisateur non connecté' });
         } else {
-            console.log(data);
             if(data.admin !== undefined){
                 req.token = data;
                 next();

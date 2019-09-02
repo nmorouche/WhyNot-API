@@ -77,8 +77,6 @@ router.post('/ban', verifyTokenAdmin, async function (req, res, next) {
         const colUser = db.collection('users');
         //INSERT ONE DOCUMENT
         await colUser.updateOne({_id:ObjectId( req.body.idReported)},{$set: {banned:true,reported:false}})
-
-        console.log(req.token);
         res.send({
             status: 200,
             error:null
